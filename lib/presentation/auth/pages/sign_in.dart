@@ -1,5 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app_clean_architecture/common/helper/message/display_message.dart';
+import 'package:movie_app_clean_architecture/data/auth/models/signin_req_params.dart';
+import 'package:movie_app_clean_architecture/domain/auth/usecases/signin.dart';
+import 'package:movie_app_clean_architecture/presentation/home/pages/home.dart';
+import 'package:movie_app_clean_architecture/service_locator.dart';
 
 import 'package:reactive_button/reactive_button.dart';
 
@@ -8,7 +13,10 @@ import 'package:movie_app_clean_architecture/core/config/theme/app_colors.dart';
 import 'package:movie_app_clean_architecture/presentation/auth/pages/sign_up.dart';
 
 class SignInPage extends StatelessWidget {
-  const SignInPage({super.key});
+  SignInPage({super.key});
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   Widget _signInText() {
     return const Text(
@@ -21,28 +29,39 @@ class SignInPage extends StatelessWidget {
   }
 
   Widget _emailField() {
-    return const TextField(
-      decoration: InputDecoration(
+    return TextField(
+      controller: _emailController,
+      decoration: const InputDecoration(
         hintText: 'Email',
       ),
     );
   }
 
   Widget _passwordField() {
-    return const TextField(
-      decoration: InputDecoration(
+    return TextField(
+      controller: _passwordController,
+      decoration: const InputDecoration(
         hintText: 'Password',
       ),
     );
   }
 
-  Widget _signInButton() {
+  Widget _signInButton(BuildContext context) {
     return ReactiveButton(
       title: 'Sign In',
       activeColor: AppColors.primary,
-      onPressed: () async {},
-      onSuccess: () {},
-      onFailure: (error) {},
+      onPressed: () async => sl<SignInUseCase>().call(
+        params: SigninReqParams(
+          email: _emailController.text,
+          password: _passwordController.text,
+        ),
+      ),
+      onSuccess: () {
+        AppNavigator.pushAndRemove(context, const HomePage());
+      },
+      onFailure: (error) {
+        DisplayMessage.errorMessage(error, context);
+      },
     );
   }
 
@@ -56,7 +75,7 @@ class SignInPage extends StatelessWidget {
             style: const TextStyle(color: Colors.blue),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                AppNavigator.push(context, const SignUpPage());
+                AppNavigator.push(context, SignUpPage());
               },
           ),
         ],
@@ -79,7 +98,7 @@ class SignInPage extends StatelessWidget {
             const SizedBox(height: 20),
             _passwordField(),
             const SizedBox(height: 60),
-            _signInButton(),
+            _signInButton(context),
             const SizedBox(height: 20),
             _signupText(context),
           ],
