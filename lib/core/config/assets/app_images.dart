@@ -1,5 +1,7 @@
 class AppImages {
-  static const String basePath = 'assets/images/';
+  static const String _basePath = 'assets/images/';
 
-  static const String splashBackground = '${basePath}splash-bg.png';
+  static const String movieImageBasePath = 'https://image.tmdb.org/t/p/w500';
+
+  static const String splashBackground = '${_basePath}splash-bg.png';
 }
